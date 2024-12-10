@@ -1,4 +1,6 @@
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { Link } from "@tanstack/react-router"
 
 export function LandingHero() {
     return (
@@ -12,8 +14,8 @@ export function LandingHero() {
                     Ejemplo práctico de organización de carpetas para proyectos de desarrollo web frontend con Next.js o Vite.
                 </p>
                 <div className="mt-6 flex justify-center gap-4">
-                    <Button size="lg">Empezar ahora</Button>
-                    <Button variant="outline" size="lg">Ver documentación</Button>
+                    <Link to="/users" className={cn(buttonVariants({ variant: 'default' }))}>Ver demo</Link>
+                    <Link to="/docs" className={cn(buttonVariants({ variant: 'outline' }))}>Ver documentación</Link>
                 </div>
             </div>
         </section>

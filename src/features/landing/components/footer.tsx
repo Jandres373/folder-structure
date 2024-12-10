@@ -6,16 +6,16 @@ export function LandingFooter() {
                     <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
                         Built by{" "}
                         <a
-                            href="https://github.com/tu-usuario"
+                            href="https://github.com/xxxxxxxxxx"
                             target="_blank"
                             rel="noreferrer"
                             className="font-medium underline underline-offset-4"
                         >
-                            Tu nombre
+                            Bairu
                         </a>
                         . The source code is available on{" "}
                         <a
-                            href="https://github.com/tu-usuario/bairu"
+                            href="https://github.com/bairu"
                             target="_blank"
                             rel="noreferrer"
                             className="font-medium underline underline-offset-4"

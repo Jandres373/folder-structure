@@ -1,12 +1,19 @@
+import { NotFound } from '@/components/fallbacks/NotFound'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
 export const Route = createRootRoute({
-    notFoundComponent: () => <div>crear un fallback</div>,
+    notFoundComponent: NotFound,
+    beforeLoad: () => {
+        console.log('beforeLoad')
+    },
     component: () => (
-        <>
-            <Outlet />
+        <div className='w-[100dvw] h-[100dvh] overflow-hidden'>
+            <ScrollArea className='w-full h-full'>
+                <Outlet />
+            </ScrollArea>
             <TanStackRouterDevtools />
-        </>
+        </div>
     ),
 })
