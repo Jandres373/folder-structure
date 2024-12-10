@@ -132,3 +132,12 @@ export class Fetcher {
     return error;
   }
 }
+
+
+export const fetchData = new Fetcher({
+  baseURL: 'https://jsonplaceholder.typicode.com', // esto debería venir de una variable de entorno
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
