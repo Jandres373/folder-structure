@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { useGetUsersQuery } from '../api/users.queries';
 import { Card, CardFooter, CardHeader, CardContent } from '@/components/ui/card';
 
@@ -30,10 +31,9 @@ export function UsersList() {
                         </CardHeader>
                         <CardContent>
                             <p>Email: {user.email}</p>
-                            <p>Created At: {new Date(user.createdAt).toLocaleDateString()}</p>
                         </CardContent>
                         <CardFooter>
-                            <button className="btn btn-primary">View Details</button>
+                            <Link to={'/users/$userId'} params={{ userId: String(user.id) }}>Ver usuario</Link>
                         </CardFooter>
                     </Card>
                 ))}
