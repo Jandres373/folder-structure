@@ -1,0 +1,112 @@
+# Arquitectura del Proyecto
+
+## Visión General
+
+La arquitectura del proyecto está diseñada siguiendo las mejores prácticas de React y TypeScript, con un enfoque en la modularidad, mantenibilidad y escalabilidad.
+
+## Estructura del Proyecto
+
+```
+src/
+├── components/        # Componentes reutilizables
+├── routes/           # Rutas y páginas de la aplicación
+├── lib/              # Utilidades y helpers
+├── hooks/            # Custom hooks
+├── types/            # Definiciones de tipos TypeScript
+└── styles/           # Estilos globales y utilidades
+```
+
+## Componentes Principales
+
+### Sistema de Routing
+
+El proyecto utiliza un sistema de routing basado en archivos, donde cada archivo en el directorio `routes` representa una ruta en la aplicación.
+
+### Componentes
+
+Los componentes siguen una estructura modular:
+- **Componentes de UI**: Elementos reutilizables de la interfaz
+- **Componentes de Layout**: Estructuras de página
+- **Componentes de Página**: Componentes específicos de cada ruta
+
+### Estado y Gestión de Datos
+
+- Uso de React Context para estado global cuando sea necesario
+- Custom hooks para lógica reutilizable
+- Gestión de estado local con useState y useReducer
+
+## Convenciones de Código
+
+### Nombrado
+
+- **Componentes**: PascalCase (ej: `Button.tsx`)
+- **Utilidades**: camelCase (ej: `formatDate.ts`)
+- **Hooks**: use + PascalCase (ej: `useAuth.ts`)
+
+### Estructura de Archivos
+
+Cada componente debe seguir esta estructura:
+```typescript
+// Imports
+import React from 'react'
+import { type Props } from './types'
+
+// Interfaces/Types (si no están en archivo separado)
+interface ComponentProps {
+  // ...
+}
+
+// Componente
+export const Component: React.FC<ComponentProps> = ({ ...props }) => {
+  return (
+    // ...
+  )
+}
+```
+
+## Patrones de Diseño
+
+### Composición de Componentes
+
+Preferimos la composición sobre la herencia:
+
+```typescript
+// ✅ Bueno
+<Card>
+  <CardHeader>
+    <CardTitle>Título</CardTitle>
+  </CardHeader>
+</Card>
+
+// ❌ Evitar
+<Card title="Título" showHeader={true} />
+```
+
+### Manejo de Estado
+
+Utilizamos el patrón de "lifting state up" cuando es necesario compartir estado entre componentes hermanos.
+
+## Seguridad
+
+- Validación de tipos en tiempo de compilación con TypeScript
+- Sanitización de inputs
+- Manejo seguro de datos sensibles
+
+## Performance
+
+- Code splitting automático con Vite
+- Lazy loading de componentes
+- Optimización de imágenes
+- Minimización de re-renders innecesarios
+
+## Testing
+
+La estructura de pruebas sigue el patrón:
+```
+src/
+└── components/
+    └── Button/
+        ├── Button.tsx
+        ├── Button.test.tsx
+        └── index.ts
+```

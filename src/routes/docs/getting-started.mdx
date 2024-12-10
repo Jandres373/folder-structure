@@ -1,0 +1,71 @@
+# Primeros Pasos
+
+## Instalación
+
+1. Clona el repositorio:
+```bash
+git clone [URL-del-repositorio]
+cd [nombre-del-proyecto]
+```
+
+2. Instala las dependencias:
+```bash
+npm install
+```
+
+3. Inicia el servidor de desarrollo:
+```bash
+npm run dev
+```
+
+## Configuración
+
+### Configuración del Entorno
+
+El proyecto utiliza varias configuraciones importantes:
+
+1. **TypeScript** (`tsconfig.json`, `tsconfig.node.json`, `tsconfig.app.json`):
+   - Configuración específica para el proyecto
+   - Configuración para el entorno Node
+   - Configuración para la aplicación
+
+2. **Vite** (`vite.config.ts`):
+   - Configuración del servidor de desarrollo
+   - Optimizaciones de build
+   - Plugins y extensiones
+
+3. **ESLint** (`eslint.config.js`):
+   - Reglas de linting
+   - Integración con TypeScript
+   - Configuración de React
+
+4. **Tailwind CSS** (`tailwind.config.js`):
+   - Personalización de tema
+   - Plugins
+   - Configuración de contenido
+
+## Scripts Disponibles
+
+- `npm run dev`: Inicia el servidor de desarrollo
+- `npm run build`: Construye la aplicación para producción
+- `npm run lint`: Ejecuta el linter
+- `npm run preview`: Previsualiza la build de producción
+
+## Estructura de Directorios
+
+```
+/
+├── src/               # Código fuente
+├── public/            # Archivos estáticos
+├── components.json    # Configuración de componentes
+├── package.json      # Dependencias y scripts
+└── vite.config.ts    # Configuración de Vite
+```
+
+## Siguientes Pasos
+
+Una vez que tengas el proyecto funcionando localmente, te recomendamos:
+
+1. Revisar la [Arquitectura](./architecture) del proyecto
+2. Familiarizarte con la [Guía de Desarrollo](./development-guide)
+3. Explorar la [Guía de Estilo](./style-guide)

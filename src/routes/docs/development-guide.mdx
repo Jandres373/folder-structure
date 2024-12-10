@@ -1,0 +1,145 @@
+# Guía de Desarrollo
+
+## Flujo de Trabajo
+
+### 1. Configuración del Entorno
+
+Asegúrate de tener instalado:
+- Node.js (versión LTS)
+- npm o yarn
+- Git
+- Tu editor favorito (recomendamos VS Code)
+
+### 2. Convenciones de Código
+
+#### Estilo de Código
+
+Seguimos las siguientes convenciones:
+
+```typescript
+// Imports organizados
+import React from 'react'
+import type { FC } from 'react'
+import { useEffect, useState } from 'react'
+
+// Interfaces/Types
+interface Props {
+  title: string
+  children: React.ReactNode
+}
+
+// Componente
+export const Component: FC<Props> = ({ title, children }) => {
+  // ...
+}
+```
+
+#### Commits
+
+Utilizamos commits convencionales:
+```bash
+feat: añade nuevo componente Button
+fix: corrige error en la validación de formularios
+docs: actualiza documentación de API
+style: mejora formato del código
+refactor: reorganiza estructura de componentes
+test: añade pruebas para AuthContext
+```
+
+### 3. Desarrollo de Componentes
+
+1. Crear nuevo componente:
+```bash
+src/components/
+└── Button/
+    ├── Button.tsx
+    ├── Button.test.tsx
+    ├── Button.module.css (si es necesario)
+    └── index.ts
+```
+
+2. Implementar el componente siguiendo el patrón:
+```typescript
+import React from 'react'
+import type { ButtonProps } from './types'
+
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = 'primary',
+  ...props
+}) => {
+  return (
+    <button
+      className={`btn btn-${variant}`}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
+```
+
+### 4. Testing
+
+Escribimos tests para:
+- Componentes UI
+- Hooks personalizados
+- Utilidades
+- Integraciones
+
+Ejemplo de test:
+```typescript
+import { render, screen } from '@testing-library/react'
+import { Button } from './Button'
+
+describe('Button', () => {
+  it('renders children correctly', () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByText('Click me')).toBeInTheDocument()
+  })
+})
+```
+
+## Contribución
+
+### Proceso de Pull Request
+
+1. Crea una nueva rama desde `main`:
+```bash
+git checkout -b feature/nombre-feature
+```
+
+2. Realiza tus cambios siguiendo las convenciones
+
+3. Ejecuta los tests:
+```bash
+npm run test
+```
+
+4. Crea el pull request con:
+   - Descripción clara de los cambios
+   - Referencias a issues relacionados
+   - Screenshots si es necesario
+
+### Code Review
+
+- Revisión de código requerida antes de merge
+- Cumplimiento de estándares de código
+- Tests pasando
+- No conflictos con `main`
+
+## Troubleshooting
+
+### Problemas Comunes
+
+1. **Error de TypeScript**
+   - Verifica las definiciones de tipos
+   - Actualiza @types/* si es necesario
+
+2. **Fallos en Tests**
+   - Ejecuta tests en modo watch
+   - Verifica mocks y setup
+
+3. **Problemas de Build**
+   - Limpia cache: `npm run clean`
+   - Reinstala dependencias
