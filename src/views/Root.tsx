@@ -1,6 +1,9 @@
 import { LandingFooter } from "@/features/landing/components/footer"
 import { LandingHero } from "@/features/landing/components/hero"
 import { LandingNavbar } from "@/features/landing/components/navbar"
+import { logger } from "@/utils/logger/logger"
+
+
 
 function Root() {
     return (

@@ -1,5 +1,6 @@
 import { Fetcher } from "@/utils/fetch_data/fetcher";
 import { User } from "../types/user.types";
+import { logger } from "@/utils/logger/logger";
 
 const fetchData = new Fetcher({
     baseURL: 'https://jsonplaceholder.typicode.com', // esto debería venir de una variable de entorno
@@ -14,5 +15,6 @@ export async function getUsers() {
 }
 
 export async function getUser(id: number) {
+    logger.info(`obteniendo datos del usuario con id ${id}`)
     return await fetchData.get<User>(`/users/${id}`);
 }
