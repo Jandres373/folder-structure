@@ -1,5 +1,7 @@
-import { StrictMode } from 'react'
+import './index.css'
 import ReactDOM from 'react-dom/client'
+
+import { StrictMode } from 'react'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 // Import the generated route tree
