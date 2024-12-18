@@ -1,0 +1,285 @@
+# Testing End-to-End con Cypress
+
+Esta guía cubre los fundamentos de testing end-to-end (E2E) usando Cypress.
+
+## Configuración Inicial
+
+1. **Instalación**
+```bash
+npm install cypress --save-dev
+```
+
+2. **Configuración básica**
+```javascript
+// cypress.config.ts
+import { defineConfig } from 'cypress'
+
+export default defineConfig({
+  e2e: {
+    baseUrl: 'http://localhost:3000',
+    supportFile: 'cypress/support/e2e.ts',
+    specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
+  },
+})
+```
+
+## Estructura de Tests
+
+```
+cypress/
+├── e2e/                 # Tests E2E
+│   ├── auth/
+│   │   └── login.cy.ts
+│   └── users/
+│       └── crud.cy.ts
+├── fixtures/            # Data de prueba
+│   └── users.json
+├── support/            # Comandos personalizados
+│   ├── commands.ts
+│   └── e2e.ts
+└── screenshots/        # Capturas automáticas
+```
+
+## Fundamentos de Cypress
+
+### 1. Selectores
+
+```typescript
+// Mejores prácticas para selectores
+cy.get('[data-testid=login-button]')  // Preferido
+cy.get('.login-btn')                  // CSS
+cy.contains('Login')                  // Texto
+cy.get('button').first()             // Posición
+```
+
+### 2. Acciones Básicas
+
+```typescript
+// Interacciones comunes
+cy.get('[data-testid=username]')
+  .type('usuario@ejemplo.com')        // Escribir
+  .should('have.value', 'usuario@ejemplo.com')
+
+cy.get('[data-testid=login-button]')
+  .click()                           // Click
+
+cy.get('[data-testid=dropdown]')
+  .select('opción')                  // Select
+
+cy.get('[data-testid=checkbox]')
+  .check()                           // Checkbox
+```
+
+### 3. Aserciones
+
+```typescript
+// Validaciones
+cy.get('[data-testid=mensaje]')
+  .should('be.visible')              // Visibilidad
+  .and('contain', 'Bienvenido')      // Contenido
+
+cy.get('[data-testid=lista]')
+  .should('have.length', 5)          // Cantidad
+
+cy.get('[data-testid=input]')
+  .should('have.class', 'error')     // Clase CSS
+```
+
+## Patrones Comunes
+
+### 1. Page Objects
+
+```typescript
+// cypress/support/pages/LoginPage.ts
+class LoginPage {
+  visit() {
+    cy.visit('/login')
+  }
+
+  fillUsername(value: string) {
+    cy.get('[data-testid=username]').type(value)
+  }
+
+  fillPassword(value: string) {
+    cy.get('[data-testid=password]').type(value)
+  }
+
+  submit() {
+    cy.get('[data-testid=submit]').click()
+  }
+}
+
+export const loginPage = new LoginPage()
+```
+
+### 2. Comandos Personalizados
+
+```typescript
+// cypress/support/commands.ts
+Cypress.Commands.add('login', (email: string, password: string) => {
+  cy.visit('/login')
+  cy.get('[data-testid=username]').type(email)
+  cy.get('[data-testid=password]').type(password)
+  cy.get('[data-testid=submit]').click()
+})
+
+// Uso en tests
+cy.login('usuario@ejemplo.com', 'contraseña123')
+```
+
+### 3. Fixtures
+
+```typescript
+// cypress/fixtures/user.json
+{
+  "email": "usuario@ejemplo.com",
+  "password": "contraseña123"
+}
+
+// Uso en tests
+cy.fixture('user').then((user) => {
+  cy.login(user.email, user.password)
+})
+```
+
+## Ejemplos Prácticos
+
+### 1. Test de Login
+
+```typescript
+describe('Login Flow', () => {
+  beforeEach(() => {
+    cy.visit('/login')
+  })
+
+  it('should login successfully', () => {
+    cy.get('[data-testid=username]')
+      .type('usuario@ejemplo.com')
+    
+    cy.get('[data-testid=password]')
+      .type('contraseña123')
+    
+    cy.get('[data-testid=submit]')
+      .click()
+    
+    cy.url()
+      .should('include', '/dashboard')
+    
+    cy.get('[data-testid=welcome-message]')
+      .should('contain', 'Bienvenido')
+  })
+
+  it('should show error on invalid credentials', () => {
+    cy.get('[data-testid=username]')
+      .type('invalid@ejemplo.com')
+    
+    cy.get('[data-testid=password]')
+      .type('wrong123')
+    
+    cy.get('[data-testid=submit]')
+      .click()
+    
+    cy.get('[data-testid=error-message]')
+      .should('be.visible')
+      .and('contain', 'Credenciales inválidas')
+  })
+})
+```
+
+### 2. Test de CRUD
+
+```typescript
+describe('User CRUD', () => {
+  beforeEach(() => {
+    cy.login('admin@ejemplo.com', 'admin123')
+    cy.visit('/users')
+  })
+
+  it('should create a new user', () => {
+    cy.get('[data-testid=add-user]').click()
+    
+    cy.get('[data-testid=name-input]')
+      .type('Nuevo Usuario')
+    
+    cy.get('[data-testid=email-input]')
+      .type('nuevo@ejemplo.com')
+    
+    cy.get('[data-testid=save-button]')
+      .click()
+    
+    cy.get('[data-testid=users-table]')
+      .should('contain', 'Nuevo Usuario')
+  })
+})
+```
+
+## Mejores Prácticas
+
+1. **Selectores**
+   - Usar `data-testid` para elementos clave
+   - Evitar selectores frágiles (clases CSS, índices)
+   - Mantener selectores consistentes
+
+2. **Organización**
+   - Usar Page Objects para reutilización
+   - Agrupar tests relacionados
+   - Mantener tests independientes
+
+3. **Datos**
+   - Usar fixtures para datos de prueba
+   - Limpiar estado entre tests
+   - Evitar dependencias entre tests
+
+4. **Rendimiento**
+   - Minimizar visitas a páginas
+   - Usar comandos personalizados
+   - Agrupar acciones relacionadas
+
+## Tips Avanzados
+
+1. **Interceptación de Red**
+```typescript
+cy.intercept('GET', '/api/users', { fixture: 'users.json' })
+cy.intercept('POST', '/api/users').as('createUser')
+```
+
+2. **Variables de Entorno**
+```typescript
+// cypress.env.json
+{
+  "apiUrl": "http://api.ejemplo.com",
+  "adminUser": "admin@ejemplo.com"
+}
+
+// Uso
+Cypress.env('apiUrl')
+```
+
+3. **Screenshots y Videos**
+```typescript
+cy.screenshot('login-error')
+```
+
+4. **Reportes**
+```bash
+npm install --save-dev mochawesome
+```
+
+## Debugging
+
+1. **Pausar Tests**
+```typescript
+cy.get('.elemento').then($el => {
+  debugger
+})
+```
+
+2. **Logging**
+```typescript
+cy.log('Iniciando login...')
+```
+
+3. **Time Travel**
+   - Usar la UI de Cypress
+   - Revisar cada paso
+   - Inspeccionar estado

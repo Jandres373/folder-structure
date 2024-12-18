@@ -1,0 +1,193 @@
+# Guía de Estilo
+
+<div className="flex items-center gap-2 p-4 bg-rose-50 rounded-lg border border-rose-200 mb-8">
+  <span role="img" aria-label="palette" className="text-2xl">🎨</span>
+  <p className="text-sm text-rose-800">
+    Esta guía define los estándares de diseño y estilo visual que utilizamos en todo el proyecto.
+  </p>
+</div>
+
+## Diseño Visual
+
+### Colores
+
+Utilizamos un sistema de colores consistente definido en Tailwind:
+
+```typescript
+// tailwind.config.js
+module.exports = {
+  theme: {
+    colors: {
+      primary: {
+        50: '#f0f9ff',
+        500: '#0ea5e9',
+        900: '#0c4a6e',
+      },
+      // ... otros colores
+    }
+  }
+}
+```
+
+### Tipografía
+
+- **Fuente Principal**: Inter
+- **Tamaños de Fuente**:
+  - xs: 0.75rem
+  - sm: 0.875rem
+  - base: 1rem
+  - lg: 1.125rem
+  - xl: 1.25rem
+
+### Espaciado
+
+Seguimos un sistema de espaciado consistente:
+```css
+/* Espaciado vertical */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+/* Espaciado horizontal */
+.space-x-4 > * + * {
+  margin-left: 1rem;
+}
+```
+
+## Componentes UI
+
+### Botones
+
+```typescript
+// Variantes de botones
+<Button variant="primary">
+  Acción Principal
+</Button>
+
+<Button variant="secondary">
+  Acción Secundaria
+</Button>
+
+<Button variant="ghost">
+  Acción Terciaria
+</Button>
+```
+
+### Inputs
+
+```typescript
+// Estilos consistentes para inputs
+<Input
+  className="w-full px-4 py-2 border rounded-md"
+  placeholder="Escribe aquí..."
+/>
+```
+
+### Cards
+
+```typescript
+<Card>
+  <CardHeader>
+    <CardTitle>Título</CardTitle>
+    <CardDescription>Descripción</CardDescription>
+  </CardHeader>
+  <CardContent>
+    Contenido
+  </CardContent>
+</Card>
+```
+
+## Responsive Design
+
+### Breakpoints
+
+Utilizamos los breakpoints estándar de Tailwind:
+
+- sm: 640px
+- md: 768px
+- lg: 1024px
+- xl: 1280px
+- 2xl: 1536px
+
+```typescript
+// Ejemplo de uso
+<div className="w-full md:w-1/2 lg:w-1/3">
+  {/* Contenido responsivo */}
+</div>
+```
+
+### Grid System
+
+```typescript
+// Grid básico
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div>Item 1</div>
+  <div>Item 2</div>
+  <div>Item 3</div>
+</div>
+```
+
+## Animaciones
+
+### Transiciones
+
+```typescript
+// Transiciones suaves
+<div className="transition-all duration-300 ease-in-out">
+  {/* Contenido con transición */}
+</div>
+```
+
+### Hover States
+
+```typescript
+// Estados hover consistentes
+<button className="hover:bg-primary-600 transition-colors duration-200">
+  Hover me
+</button>
+```
+
+## Accesibilidad
+
+### Contraste de Color
+
+- Asegurar ratio de contraste mínimo de 4.5:1
+- Usar utilidades de Tailwind para contraste
+
+### Keyboard Navigation
+
+```typescript
+// Foco visible
+<button className="focus:ring-2 focus:ring-primary-500 focus:outline-none">
+  Focusable
+</button>
+```
+
+### ARIA Labels
+
+```typescript
+// Etiquetas ARIA apropiadas
+<button
+  aria-label="Cerrar modal"
+  className="..."
+>
+  <IconX />
+</button>
+```
+
+## Dark Mode
+
+```typescript
+// Soporte para modo oscuro
+<div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+  Contenido adaptable
+</div>
+```
+
+## Mejores Prácticas
+
+1. Usar variables CSS para valores reutilizables
+2. Mantener consistencia en espaciado y tipografía
+3. Seguir principios de diseño responsivo
+4. Priorizar accesibilidad
+5. Mantener componentes modulares y reutilizables

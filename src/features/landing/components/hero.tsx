@@ -1,11 +1,8 @@
-import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { logger } from "@/utils/logger/logger"
 import { Link } from "@tanstack/react-router"
+import { buttonVariants } from "@/shared/components/ui/button"
 
 export function LandingHero() {
-
-    logger.info('Hello world!')
     return (
         <section className="flex items-center justify-center min-h-screen bg-white text-gray-800 shadow-lg">
             <div className="text-center p-6">

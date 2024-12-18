@@ -1,0 +1,190 @@
+# Arquitectura del Proyecto
+
+<div className="flex items-center gap-2 p-4 bg-primary/5 rounded-lg border border-primary/20 mb-8">
+  <span role="img" aria-label="building" className="text-2xl">🏗️</span>
+  <p className="text-sm text-zinc-700">
+    Este documento describe la arquitectura del proyecto, basada en Screaming Architecture y organizada por features.
+  </p>
+</div>
+
+## Visión General
+
+La arquitectura del proyecto sigue un enfoque modular y escalable, organizado en capas jerárquicas que van desde las rutas hasta los componentes individuales:
+
+```bash
+src/
+├── routes/           # Definición de rutas y URLs
+├── pages/            # Componentes de página
+├── features/         # Funcionalidades modulares
+├── shared/           # Componentes y utilidades compartidas
+└── utils/            # Utilidades generales
+```
+
+## Screaming Architecture
+
+<div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-6">
+  <h3 className="font-semibold mb-2 text-blue-900">💡 ¿Qué es Screaming Architecture?</h3>
+  <p className="text-sm text-blue-800">
+    Es un patrón arquitectónico donde la estructura de carpetas "grita" el propósito de la aplicación. Cada feature debe nombrarse de manera que explique claramente su función.
+  </p>
+</div>
+
+## Jerarquía de Componentes
+
+1. **Rutas (URLs)**
+   - Nivel más alto de la aplicación
+   - Definen los puntos de entrada
+   - Gestionadas por TanStack Router
+
+2. **Páginas**
+   - Componentes que corresponden a rutas
+   - Controlan el layout y disposición de features
+   - Actúan como orquestadores de features
+
+3. **Features**
+   - Agrupaciones funcionales de componentes
+   - Encapsulan una funcionalidad específica
+   - Mantienen su propia estructura interna
+
+4. **Componentes**
+   - Unidades más pequeñas y reutilizables
+   - Forman parte de las features
+   - Mantienen responsabilidad única
+
+## Estructura de Features
+
+Cada feature sigue una estructura interna predefinida:
+
+```bash
+feature_name/
+├── api/              # Queries y mutaciones de TanStack Query
+├── components/       # Componentes React específicos
+├── hooks/           # Hooks personalizados
+├── state/           # Estado global (Zustand)
+├── services/        # Funciones de conexión con el servidor
+├── types/           # Tipos TypeScript
+├── content/         # Contenido (MDX, JSON, etc.)
+└── styles/          # Estilos específicos
+```
+
+### Descripción de Carpetas
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h4 className="font-semibold mb-2">📡 api/</h4>
+    <p className="text-sm text-muted-foreground">
+      Contiene queries y mutaciones de TanStack Query para manejo de datos remotos.
+    </p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h4 className="font-semibold mb-2">🧩 components/</h4>
+    <p className="text-sm text-muted-foreground">
+      Componentes React específicos de la feature.
+    </p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h4 className="font-semibold mb-2">🎣 hooks/</h4>
+    <p className="text-sm text-muted-foreground">
+      Hooks personalizados para lógica reutilizable.
+    </p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h4 className="font-semibold mb-2">💾 state/</h4>
+    <p className="text-sm text-muted-foreground">
+      Gestión de estado global usando Zustand.
+    </p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h4 className="font-semibold mb-2">🔌 services/</h4>
+    <p className="text-sm text-muted-foreground">
+      Funciones para comunicación con el servidor.
+    </p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h4 className="font-semibold mb-2">📝 types/</h4>
+    <p className="text-sm text-muted-foreground">
+      Definiciones de tipos TypeScript.
+    </p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h4 className="font-semibold mb-2">📚 content/</h4>
+    <p className="text-sm text-muted-foreground">
+      Contenido estático en MDX, JSON o TS.
+    </p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h4 className="font-semibold mb-2">🎨 styles/</h4>
+    <p className="text-sm text-muted-foreground">
+      Estilos específicos de la feature.
+    </p>
+  </div>
+</div>
+
+## Ejemplo de Feature
+
+Tomemos como ejemplo la feature de documentación (`docs_`):
+
+```typescript
+// Estructura típica de una feature
+docs_/
+├── api/
+│   └── queries.ts
+│   └── migrations.ts
+├── components/
+│   ├── DocSidebarFeat.tsx
+│   └── DocContentFeat.tsx
+├── hooks/
+│   └── useDocNavigation.ts
+├── state/
+│   └── docsStore.ts
+├── content/
+│   └── docs/
+│       ├── introduction.mdx
+│       └── architecture.mdx
+└── types/
+    └── documentation.ts
+```
+
+## Beneficios de esta Arquitectura
+
+1. **Modularidad**
+   - Cada feature es independiente y autocontenida
+   - Facilita el mantenimiento y testing
+   - Permite el desarrollo paralelo
+
+2. **Escalabilidad**
+   - Fácil agregar nuevas features
+   - Estructura consistente y predecible
+   - Clara separación de responsabilidades
+
+3. **Reutilización**
+   - Componentes compartidos en `shared/`
+   - Hooks y utilidades reutilizables
+   - Patrones consistentes
+
+4. **Mantenibilidad**
+   - Código organizado y predecible
+   - Fácil localización de funcionalidades
+   - Clara separación de concerns
+
+## Mejores Prácticas
+
+1. **Nombrado de Features**
+   - Usar nombres descriptivos que indiquen la funcionalidad
+   - Seguir un formato consistente
+   - Evitar nombres genéricos
+
+2. **Organización de Carpetas**
+   - Crear solo las carpetas necesarias
+   - Mantener una estructura plana cuando sea posible
+   - Seguir el principio de responsabilidad única
+
+3. **Gestión de Estado**
+   - Usar Zustand para estado global
+   - TanStack Query para estado del servidor
+   - Estado local (useState) para componentes simples
+
+4. **Componentes Compartidos**
+   - Extraer componentes comunes a `shared/components` y otros tipos de recursos comunes a `shared/[tipo_de_recurso]`
+   - Mantener componentes específicos en features
+   - Documentar componentes reutilizables

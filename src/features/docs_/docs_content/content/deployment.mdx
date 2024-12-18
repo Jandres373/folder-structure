@@ -1,0 +1,177 @@
+# Guía de Despliegue
+
+<div className="flex items-center gap-2 p-4 bg-emerald-50 rounded-lg border border-emerald-200 mb-8">
+  <span role="img" aria-label="rocket" className="text-2xl">🚀</span>
+  <p className="text-sm text-emerald-800">
+    Esta guía te ayudará a preparar y desplegar tu aplicación en producción de manera segura y eficiente.
+  </p>
+</div>
+
+## Preparación para Producción
+
+### 1. Verificación Pre-Despliegue
+
+```bash
+# Ejecutar tests
+npm run test
+
+# Verificar tipos
+npm run type-check
+
+# Construir aplicación
+npm run build
+```
+
+### 2. Optimizaciones
+
+- Asegurar que todas las imágenes están optimizadas
+- Verificar que el code splitting está configurado correctamente
+- Comprobar que las dependencias de desarrollo no están en producción
+
+## Proceso de Build
+
+### Configuración de Vite
+
+```typescript
+// vite.config.ts
+export default defineConfig({
+  build: {
+    target: 'esnext',
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          // otros chunks...
+        }
+      }
+    }
+  }
+})
+```
+
+### Variables de Entorno
+
+```bash
+# .env.production
+VITE_API_URL=https://api.produccion.com
+VITE_ANALYTICS_ID=UA-XXXXX-Y
+```
+
+## Despliegue
+
+### Plataformas Recomendadas
+
+1. **Vercel**
+```bash
+# Instalar Vercel CLI
+npm i -g vercel
+
+# Desplegar
+vercel
+```
+
+2. **Netlify**
+```bash
+# Instalar Netlify CLI
+npm i -g netlify-cli
+
+# Desplegar
+netlify deploy
+```
+
+### Docker
+
+```dockerfile
+# Dockerfile
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+## Monitoreo
+
+### Analytics
+
+```typescript
+// Configuración de analytics
+import { Analytics } from '@vercel/analytics/react'
+
+function App() {
+  return (
+    <>
+      <YourApp />
+      <Analytics />
+    </>
+  )
+}
+```
+
+### Performance Monitoring
+
+- Lighthouse scores
+- Web Vitals
+- Error tracking
+
+## CI/CD
+
+### GitHub Actions
+
+```yaml
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Build
+        run: npm run build
+```
+
+## Rollback
+
+### Procedimiento de Rollback
+
+1. Identificar la última versión estable
+2. Revertir a esa versión
+3. Verificar funcionalidad
+4. Comunicar el rollback
+
+```bash
+# Ejemplo con Git
+git revert HEAD~1
+git push origin main
+```
+
+## Checklist de Despliegue
+
+- [ ] Tests pasando
+- [ ] Build exitoso
+- [ ] Variables de entorno configuradas
+- [ ] Optimizaciones aplicadas
+- [ ] Monitoreo configurado
+- [ ] Plan de rollback preparado
+- [ ] Documentación actualizada
