@@ -1,0 +1,147 @@
+# Guía de Migración
+
+## Preparación
+
+1. **Crear rama de refactor**
+```bash
+git checkout -b refactor/[DEVELOPER_NAME]
+```
+
+2. **Estructura de directorios recomendada**
+```
+src/
+├── features/           # Características por página
+│   └── [feature]/
+│       ├── services/  # Capa 2: Servicios
+│       └── ui/        # Componentes de UI
+├── shared/
+│   └── components/    # Componentes compartidos
+└── utils/
+    ├── fetch_data/    # Capa 1: Conexión directa al backend
+    └── error_handler/ # Manejo de errores global
+```
+
+## Plan de Migración por Fases
+
+### Fase 1: Configuración Básica
+
+1. Instalar dependencias principales (ver [getting-started](./getting-started))
+2. Configurar herramientas de desarrollo (ESLint, Prettier)
+3. Validar que todas las configuraciones estén correctas
+
+### Fase 2: Implementación de Utilidades Base
+
+1. Implementar fetcher base en `utils/fetch_data`
+2. Configurar manejador de errores global en `utils/error_handler`
+3. Migrar utilidades comunes necesarias
+
+### Fase 3: Definición de Rutas
+
+1. Identificar todas las rutas de la aplicación
+2. Definir constantes de rutas en `SERVER_ROUTES.PATHS`
+3. Configurar el enrutador con las rutas definidas
+
+### Fase 4: Definición de Páginas
+
+1. Crear estructura base para cada página
+2. Definir layouts principales
+3. Establecer navegación entre páginas
+
+### Fase 5: Implementación por Página
+
+Para cada página:
+1. Identificar features necesarias
+2. Implementar features una por una:
+   - Crear servicios necesarios
+   - Desarrollar componentes UI
+   - Implementar lógica de negocio
+3. Testear cada feature individualmente
+4. Documentar la implementación
+
+### Fase 6: Testing y Validación
+
+1. Realizar pruebas unitarias de cada feature
+2. Validar integración entre features
+3. Pruebas de integración por página
+4. Documentar resultados de pruebas
+
+### Fase 7: Seguimiento
+
+1. Actualizar estado de tareas en el gestor de proyectos
+2. Documentar features completadas
+3. Registrar cualquier desviación o mejora necesaria
+
+## Recomendaciones
+
+- Trabajar en una feature a la vez hasta completarla
+- Mantener documentación actualizada
+- Realizar commits frecuentes y descriptivos
+- Validar cada feature antes de pasar a la siguiente
+- Reportar y documentar cualquier desviación del plan
+
+## Pruebas y Validación
+
+1. **Tests unitarios**
+```typescript
+describe('UsersService', () => {
+  it('should fetch users successfully', async () => {
+    const users = await getUsers()
+    expect(users).toBeDefined()
+  })
+})
+```
+
+2. **Tests de integración**
+```typescript
+describe('useGetUsersQuery', () => {
+  it('should handle loading and success states', async () => {
+    const { result } = renderHook(() => useGetUsersQuery())
+    expect(result.current.isLoading).toBe(true)
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+  })
+})
+```
+
+## Rollback Plan
+
+1. Mantener código legacy en paralelo
+2. Feature flags para cambiar entre implementaciones
+3. Monitoreo de errores en producción
+
+## Checklist de Migración
+
+- [ ] Implementar Fetcher Base
+- [ ] Configurar manejo de errores global
+- [ ] Migrar servicios principales
+- [ ] Implementar React Query
+- [ ] Actualizar componentes
+- [ ] Añadir tests
+- [ ] Validar en ambiente de desarrollo
+- [ ] Realizar pruebas de integración
+- [ ] Desplegar a staging
+- [ ] Monitorear métricas
+- [ ] Desplegar a producción
+
+## Tips y Mejores Prácticas
+
+1. **Migración Gradual**
+   - Migrar un feature a la vez
+   - Mantener compatibilidad hacia atrás
+   - Usar feature flags para control
+
+2. **Testing**
+   - Añadir tests antes de migrar
+   - Mantener cobertura de código
+   - Validar edge cases
+
+3. **Monitoreo**
+   - Implementar logging detallado
+   - Configurar alertas
+   - Monitorear performance
+
+4. **Documentación**
+   - Actualizar docs técnicas
+   - Documentar decisiones
+   - Mantener changelog

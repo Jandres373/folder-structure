@@ -1,6 +1,6 @@
-import { Error } from '@/components/fallbacks/Error'
-import { NotFound } from '@/components/fallbacks/NotFound'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Error } from '@/shared/components/fallbacks/Error'
+import { NotFound } from '@/shared/components/fallbacks/NotFound'
+import { ScrollArea } from '@/shared/components/ui/scroll-area'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 

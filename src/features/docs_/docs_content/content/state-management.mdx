@@ -1,0 +1,303 @@
+# Gestión de Estado
+
+Esta guía explica nuestra estrategia de manejo de estado, utilizando una combinación de useState para estados locales y Zustand para estado global a nivel de feature.
+
+## Principios de Gestión de Estado
+
+1. **Localidad**: El estado debe mantenerse lo más cerca posible de donde se usa
+2. **Aislamiento**: Cada feature maneja su propio estado
+3. **Minimalismo**: Evitar estado global innecesario
+4. **Predictibilidad**: Flujo de datos unidireccional
+
+## Estado Local con useState
+
+Usar useState para estados simples y localizados:
+
+```typescript
+// components/UserCardFeat.tsx
+const UserCard: FC<{ userId: string }> = ({ userId }) => {
+    // Estado local para UI
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+
+    return (
+        <div className="card">
+            <header onClick={() => setIsExpanded(!isExpanded)}>
+                {/* ... */}
+            </header>
+            {isExpanded && (
+                <button onClick={() => setIsEditing(true)}>
+                    Edit
+                </button>
+            )}
+            {/* ... */}
+        </div>
+    );
+};
+```
+
+### Cuándo usar useState
+- Estados de UI (expanded/collapsed, active tab)
+- Formularios simples
+- Toggles y switches
+- Estados temporales
+- Datos que no necesitan ser compartidos
+
+## Estado Global con Zustand
+
+Zustand para estado compartido a nivel de feature:
+
+```typescript
+// features/users/state/users.store.ts
+interface UsersState {
+    selectedUsers: string[];
+    filterCriteria: FilterCriteria;
+    selectUser: (userId: string) => void;
+    unselectUser: (userId: string) => void;
+    setFilterCriteria: (criteria: FilterCriteria) => void;
+}
+
+export const useUsersStore = create<UsersState>((set) => ({
+    selectedUsers: [],
+    filterCriteria: { status: 'all', role: 'all' },
+    
+    selectUser: (userId) => 
+        set((state) => ({
+            selectedUsers: [...state.selectedUsers, userId]
+        })),
+    
+    unselectUser: (userId) =>
+        set((state) => ({
+            selectedUsers: state.selectedUsers.filter(id => id !== userId)
+        })),
+    
+    setFilterCriteria: (criteria) =>
+        set({ filterCriteria: criteria })
+}));
+```
+
+### Cuándo usar Zustand
+- Estado compartido entre componentes de una feature
+- Listas de selección
+- Filtros y criterios de búsqueda
+- Configuraciones de feature
+- Cache local de feature
+
+## Comunicación Entre Features
+
+Para comunicación entre features, usamos un patrón de eventos:
+
+```typescript
+// shared/events/event-bus.ts
+interface EventBus {
+    subscribe: (event: string, callback: Function) => void;
+    publish: (event: string, data: any) => void;
+}
+
+export const eventBus = create<EventBus>((set, get) => ({
+    subscribers: {},
+    subscribe: (event, callback) => {
+        // Implementación de suscripción
+    },
+    publish: (event, data) => {
+        // Implementación de publicación
+    }
+}));
+
+// Feature A: Publicar evento
+const FeatureA = () => {
+    const publishUserSelected = () => {
+        eventBus.publish('userSelected', { userId: '123' });
+    };
+    // ...
+};
+
+// Feature B: Suscribirse a evento
+const FeatureB = () => {
+    useEffect(() => {
+        const unsubscribe = eventBus.subscribe(
+            'userSelected',
+            (data) => {
+                // Manejar evento
+            }
+        );
+        return () => unsubscribe();
+    }, []);
+    // ...
+};
+```
+
+## Estado Persistente
+
+Para datos que necesitan persistir entre sesiones:
+
+```typescript
+// features/settings/state/settings.store.ts
+interface SettingsState {
+    theme: 'light' | 'dark';
+    language: string;
+    setTheme: (theme: 'light' | 'dark') => void;
+    setLanguage: (lang: string) => void;
+}
+
+export const useSettingsStore = create<SettingsState>()(
+    persist(
+        (set) => ({
+            theme: 'light',
+            language: 'es',
+            setTheme: (theme) => set({ theme }),
+            setLanguage: (lang) => set({ language: lang })
+        }),
+        {
+            name: 'settings-storage'
+        }
+    )
+);
+```
+
+## Mejores Prácticas
+
+1. **Organización del Estado**
+```
+feature/
+├── state/
+│   ├── store.ts        # Definición del store
+│   ├── selectors.ts    # Selectores reutilizables
+│   └── actions.ts      # Acciones complejas
+```
+
+2. **Selectores Memoizados**
+```typescript
+const selectFilteredUsers = (state: UsersState) => {
+    const { users, filterCriteria } = state;
+    return users.filter(user => 
+        filterCriteria.status === 'all' || 
+        user.status === filterCriteria.status
+    );
+};
+```
+
+3. **Acciones Compuestas**
+```typescript
+const bulkSelectUsers = (userIds: string[]) =>
+    useUsersStore.setState((state) => ({
+        selectedUsers: [...new Set([...state.selectedUsers, ...userIds])]
+    }));
+```
+
+4. **Debugging**
+```typescript
+// Middleware para logging
+const logMiddleware = (config) => (set, get, api) =>
+    config(
+        (...args) => {
+            console.log('  applying', args)
+            set(...args)
+            console.log('  new state', get())
+        },
+        get,
+        api
+    );
+
+const useStore = create(
+    logMiddleware((set) => ({
+        // ... store implementation
+    }))
+);
+```
+
+## Anti-patrones a Evitar
+
+1. **Estado Global Excesivo**
+❌ No guardar todo en estado global
+✅ Usar useState para estados locales
+
+2. **Acoplamiento entre Features**
+❌ No acceder directamente al estado de otras features
+✅ Usar el event bus para comunicación
+
+3. **Estado Redundante**
+❌ No duplicar estado que ya existe
+✅ Usar selectores para derivar datos
+
+4. **Mutación Directa**
+❌ No mutar el estado directamente
+✅ Usar las acciones del store
+
+## Ejemplos de Integración
+
+### 1. Feature con Estado Local y Global
+
+```typescript
+// features/users/components/UserListFeat.tsx
+const UserList = () => {
+    // Estado local para UI
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    
+    // Estado global de la feature
+    const { 
+        selectedUsers,
+        filterCriteria,
+        selectUser 
+    } = useUsersStore();
+    
+    // Estado del servidor
+    const { data: users } = useQuery(['users', filterCriteria], 
+        () => fetchUsers(filterCriteria)
+    );
+
+    return (
+        <div>
+            <SortControls 
+                order={sortOrder} 
+                onChange={setSortOrder} 
+            />
+            {users?.map(user => (
+                <UserCard
+                    key={user.id}
+                    user={user}
+                    isSelected={selectedUsers.includes(user.id)}
+                    onSelect={() => selectUser(user.id)}
+                />
+            ))}
+        </div>
+    );
+};
+```
+
+### 2. Comunicación Entre Features
+
+```typescript
+// features/notifications/state/notifications.store.ts
+export const useNotificationsStore = create<NotificationsState>((set) => ({
+    notifications: [],
+    addNotification: (notification) =>
+        set((state) => ({
+            notifications: [...state.notifications, notification]
+        }))
+}));
+
+// features/users/components/UserActionsFeat.tsx
+const UserActions = () => {
+    const addNotification = useNotificationsStore(
+        state => state.addNotification
+    );
+    
+    const handleUserAction = async () => {
+        try {
+            await performAction();
+            addNotification({
+                type: 'success',
+                message: 'Action completed'
+            });
+        } catch (error) {
+            addNotification({
+                type: 'error',
+                message: error.message
+            });
+        }
+    };
+    
+    return <button onClick={handleUserAction}>Perform Action</button>;
+};
+```

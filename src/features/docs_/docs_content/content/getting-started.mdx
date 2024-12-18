@@ -1,0 +1,292 @@
+# Primeros Pasos
+
+<div className="flex items-center gap-2 p-4 bg-blue-50 rounded-lg border border-blue-200 mb-8">
+  <span role="img" aria-label="rocket" className="text-2xl">🚀</span>
+  <p className="text-sm text-blue-800">
+    Esta guía te ayudará a configurar el proyecto en tu entorno local y entender los archivos de configuración principales.
+  </p>
+</div>
+
+## Instalación de Dependencias
+
+El primer paso es instalar las dependencias principales del proyecto. Estas son fundamentales para el funcionamiento de la aplicación:
+
+```bash
+# Gestión de estado y datos
+yarn add @tanstack/react-query
+yarn add zustand
+
+# UI y componentes
+yarn add shadcn@latest
+
+# Herramientas de desarrollo
+yarn add -D eslint
+yarn add -D prettier
+yarn add -D @typescript-eslint/eslint-plugin
+yarn add -D @typescript-eslint/parser
+```
+
+## Estructura del Proyecto
+
+Una vez instaladas las dependencias, el siguiente paso es migrar o crear la estructura de carpetas sugerida. Para entender la estructura completa y los patrones de diseño, consulta la [guía de arquitectura](./architecture).
+
+## Implementación por Rutas
+
+El desarrollo debe seguir un enfoque basado en rutas:
+
+1. Identifica las rutas principales de la aplicación
+2. Para cada ruta:
+   - Implementa la configuración de la ruta
+   - Desarrolla las páginas asociadas
+   - Completa todas las variantes y estados posibles
+   - Asegúrate de que la funcionalidad está completa antes de pasar a la siguiente ruta
+
+Este enfoque asegura un desarrollo ordenado y completo de cada sección de la aplicación.
+
+### Orden de Implementación
+
+1. Configuración de rutas
+2. Desarrollo de páginas
+3. Features y Componentes específicos de la página
+4. Estados y lógica de negocio
+5. Pruebas y validación
+
+Solo cuando una ruta esté completamente implementada y probada, se debe proceder con la siguiente.
+
+## Archivos de Configuración
+
+### TypeScript
+
+#### tsconfig.json
+```json
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler"
+  }
+}
+```
+
+#### tsconfig.app.json
+```json
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "include": ["vite.config.*", "vitest.config.*", "cypress.config.*", "nightwatch.conf.*", "playwright.config.*"],
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"]
+  }
+}
+```
+
+### Vite
+
+El archivo `vite.config.ts` configura nuestro servidor de desarrollo y build:
+
+```typescript
+import path from 'path'
+import react from '@vitejs/plugin-react-swc'
+import mdx from '@mdx-js/rollup'
+import rehypePrettyCode from 'rehype-pretty-code'
+import remarkGfm from 'remark-gfm'
+import rehypeSlug from 'rehype-slug'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+
+import { defineConfig } from 'vite'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+
+const prettyCodeOptions = {
+  theme: 'github-light',
+  onVisitLine(node: any) {
+    if (node.children.length === 0) {
+      node.children = [{ type: 'text', value: ' ' }]
+    }
+  },
+  onVisitHighlightedLine(node: any) {
+    node.properties.className.push('highlighted')
+  },
+  onVisitHighlightedWord(node: any) {
+    node.properties.className = ['word']
+  },
+  keepBackground: false,
+}
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    {
+      ...mdx({
+        remarkPlugins: [remarkGfm],
+        rehypePlugins: [
+          rehypeSlug,
+          [
+            rehypeAutolinkHeadings,
+            {
+              properties: {
+                className: ['anchor'],
+              },
+            },
+          ],
+          [rehypePrettyCode, prettyCodeOptions],
+        ],
+        providerImportSource: "@mdx-js/react",
+      }),
+      enforce: 'pre',
+    },
+    react(),
+    TanStackRouterVite(),
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+})
+```
+
+### ESLint
+
+El archivo `eslint.config.js` define las reglas de linting:
+
+```javascript
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import tseslint from 'typescript-eslint'
+
+export default tseslint.config(
+  { ignores: ['dist'] },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+)
+```
+
+### Tailwind CSS
+
+El archivo `tailwind.config.js` personaliza el tema y plugins:
+
+```javascript
+/** @type {import('tailwindcss').Config} */
+export default {
+    darkMode: ["class"],
+    content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}", "./src/**/**/*.{ts,tsx,js,jsx}", "./src/**/**/**/*.{ts,tsx,js,jsx}"],
+  theme: {
+  	extend: {
+  		borderRadius: {
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		colors: {
+  			background: 'hsl(var(--background))',
+  			foreground: 'hsl(var(--foreground))',
+  			card: {
+  				DEFAULT: 'hsl(var(--card))',
+  				foreground: 'hsl(var(--card-foreground))'
+  			},
+  			popover: {
+  				DEFAULT: 'hsl(var(--popover))',
+  				foreground: 'hsl(var(--popover-foreground))'
+  			},
+  			primary: {
+  				DEFAULT: 'hsl(var(--primary))',
+  				foreground: 'hsl(var(--primary-foreground))'
+  			},
+  			secondary: {
+  				DEFAULT: 'hsl(var(--secondary))',
+  				foreground: 'hsl(var(--secondary-foreground))'
+  			},
+  			muted: {
+  				DEFAULT: 'hsl(var(--muted))',
+  				foreground: 'hsl(var(--muted-foreground))'
+  			},
+  			accent: {
+  				DEFAULT: 'hsl(var(--accent))',
+  				foreground: 'hsl(var(--accent-foreground))'
+  			},
+  			destructive: {
+  				DEFAULT: 'hsl(var(--destructive))',
+  				foreground: 'hsl(var(--destructive-foreground))'
+  			},
+  			border: 'hsl(var(--border))',
+  			input: 'hsl(var(--input))',
+  			ring: 'hsl(var(--ring))',
+  			chart: {
+  				'1': 'hsl(var(--chart-1))',
+  				'2': 'hsl(var(--chart-2))',
+  				'3': 'hsl(var(--chart-3))',
+  				'4': 'hsl(var(--chart-4))',
+  				'5': 'hsl(var(--chart-5))'
+  			}
+  		}
+  	}
+  },
+  plugins: [require("tailwindcss-animate")],
+}
+```
+
+## Scripts Disponibles
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h3 className="font-semibold mb-2">Desarrollo</h3>
+    <code className="text-sm">yarn dev</code>
+    <p className="text-sm text-muted-foreground mt-2">Inicia el servidor de desarrollo local</p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h3 className="font-semibold mb-2">Build</h3>
+    <code className="text-sm">yarn build</code>
+    <p className="text-sm text-muted-foreground mt-2">Construye la aplicación para producción</p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h3 className="font-semibold mb-2">Lint</h3>
+    <code className="text-sm">yarn lint</code>
+    <p className="text-sm text-muted-foreground mt-2">Ejecuta el linter en todo el código</p>
+  </div>
+  <div className="p-4 rounded-lg border border-border bg-card">
+    <h3 className="font-semibold mb-2">Preview</h3>
+    <code className="text-sm">yarn preview</code>
+    <p className="text-sm text-muted-foreground mt-2">Previsualiza la build de producción</p>
+  </div>
+</div>
+
+
+## Siguientes Pasos
+
+<div className="flex flex-col gap-4 mt-6">
+  <a href="./architecture" className="p-4 rounded-lg border border-border hover:border-primary transition-colors">
+    <h3 className="font-semibold">📐 Arquitectura</h3>
+    <p className="text-sm text-muted-foreground">Comprende la estructura y organización del proyecto</p>
+  </a>
+  <a href="./development-guide" className="p-4 rounded-lg border border-border hover:border-primary transition-colors">
+    <h3 className="font-semibold">👨‍💻 Guía de Desarrollo</h3>
+    <p className="text-sm text-muted-foreground">Aprende las mejores prácticas y convenciones</p>
+  </a>
+  <a href="./style-guide" className="p-4 rounded-lg border border-border hover:border-primary transition-colors">
+    <h3 className="font-semibold">🎨 Guía de Estilo</h3>
+    <p className="text-sm text-muted-foreground">Explora los componentes y estilos disponibles</p>
+  </a>
+</div>
